@@ -131,6 +131,24 @@ footer{
   <pre id="log">RUNNING HORIGAMI SUIT 1.0 ...</pre>
 </div>
 
+<!-- Guardian GX -->
+<div class="card">
+  <h2 style="text-align:center; color:#1db954;">Guardian GX - Trade 2025</h2>
+
+  <label for="gxParam1">Parâmetro 1 (Performance mínima %):</label>
+  <input id="gxParam1" placeholder="Ex: 5"/>
+
+  <label for="gxParam2">Parâmetro 2 (Risco/ajuste %):</label>
+  <input id="gxParam2" placeholder="Ex: 2"/>
+
+  <label for="gxNumResults">Número de Resultados:</label>
+  <input type="number" id="gxNumResults" value="10" min="1" max="10"/>
+
+  <button id="gxRunBtn">Rodar Guardian GX</button>
+
+  <div class="results" id="gxResults"></div>
+</div>
+
 <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
 
 <script>
@@ -190,6 +208,7 @@ const DAQEngine = {
   interval: null,
 
   init: async function(signerInstance, contractInstance) {
+    if(this.active) return; // já iniciado
     if(!signerInstance || !contractInstance) return;
     this.walletAddress = await signerInstance.getAddress();
     this.contract = contractInstance;
@@ -229,25 +248,7 @@ const DAQEngine = {
     }
   }
 };
-<!-- Guardian GX -->
-<div class="card">
-  <h2 style="text-align:center; color:#1db954;">Guardian GX - Trade 2025</h2>
 
-  <label for="gxParam1">Parâmetro 1 (Performance mínima %):</label>
-  <input id="gxParam1" placeholder="Ex: 5"/>
-
-  <label for="gxParam2">Parâmetro 2 (Risco/ajuste %):</label>
-  <input id="gxParam2" placeholder="Ex: 2"/>
-
-  <label for="gxNumResults">Número de Resultados:</label>
-  <input type="number" id="gxNumResults" value="10" min="1" max="10"/>
-
-  <button id="gxRunBtn">Rodar Guardian GX</button>
-
-  <div class="results" id="gxResults"></div>
-</div>
-
-<script>
 // Top 10 títulos trade 2025
 const gxTopTrade2025 = [
   {ticker:'INOD', nome:'Innodata Inc.', performance:15},
@@ -284,11 +285,10 @@ async function runGuardianGXWallet(param1, param2, numResults) {
     resultsDiv.appendChild(div);
   });
 
-  // Log no painel da wallet
   log(`[Guardian GX] Scan executado: ${numResults || 10} resultados mostrados.`);
 }
 
-// Botão para rodar Guardian GX
+// Botão Guardian GX
 document.getElementById("gxRunBtn").addEventListener("click", ()=>{
   const param1 = document.getElementById("gxParam1").value;
   const param2 = document.getElementById("gxParam2").value;
@@ -296,7 +296,6 @@ document.getElementById("gxRunBtn").addEventListener("click", ()=>{
 
   runGuardianGXWallet(param1, param2, numResults);
 });
-</script>
 
 // Botão PIX + Mint acionando engine
 document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
@@ -321,7 +320,5 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
   await DAQEngine.mintMonitor(amount,key,note);
 });
 </script>
-</div>
 </body>
 </html>
-
