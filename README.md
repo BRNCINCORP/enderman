@@ -86,6 +86,74 @@ Todos os placeholders e inputs são centralizados para melhor UX e acessibilidad
 O layout é otimizado para dispositivos móveis e desktops.
 
 Licença
+Política de Privacidade – Private Equity Wallet
 
+Última atualização: 27/11/2025
+
+A Enderman Cheers Wallet, desenvolvida por LUCAS JANUARIO BRNC INC ®, valoriza sua privacidade e segurança. Esta política descreve como informações pessoais e financeiras podem ser coletadas, usadas e protegidas no contexto de interações de Private Equity e transações via blockchain e PIX.
+
+1. Informações Coletadas
+
+Podemos coletar informações pessoais e financeiras, incluindo, mas não se limitando a:
+
+Endereço de carteira Ethereum e informações de conta blockchain.
+
+Dados de transações, como valores enviados via PIX e tokens mintados.
+
+Informações fornecidas pelo usuário ao gerar QR Codes ou inserir observações.
+
+Dados técnicos do dispositivo e navegador (IP, sistema operacional, versão de navegador, logs de uso).
+
+2. Uso das Informações
+
+As informações coletadas são usadas para:
+
+Conectar e interagir com contratos inteligentes (mint de tokens JANUS26).
+
+Gerar QR Codes e processar pagamentos via PIX.
+
+Monitorar e registrar logs de transações para segurança e auditoria.
+
+Melhorar a experiência de usuário e otimizar a interface da Wallet.
+
+Informações pessoais não serão vendidas ou compartilhadas com terceiros sem consentimento explícito, exceto quando exigido por lei.
+
+3. Compartilhamento de Dados
+
+Podemos compartilhar informações em casos limitados:
+
+Com provedores de serviços essenciais para operação da Wallet (ex: APIs de QR Code, servidores de blockchain).
+
+Se exigido por autoridades legais ou regulatórias.
+
+Para proteger direitos, segurança e propriedade da BRNC INC ou de seus usuários.
+
+4. Segurança
+
+A Wallet não armazena chaves privadas ou fundos do usuário; estas permanecem sob controle exclusivo do usuário.
+
+Medidas de segurança técnicas, como criptografia de dados e conexões seguras (HTTPS), são utilizadas para proteger informações em trânsito.
+
+O usuário é responsável por manter a segurança de sua carteira e dispositivos.
+
+5. Retenção de Dados
+
+Informações de transações e logs são retidas para fins operacionais e de auditoria, conforme regulamentações aplicáveis.
+
+Dados pessoais fornecidos voluntariamente (como observações em PIX) podem ser armazenados temporariamente para processar a transação.
+
+6. Direitos do Usuário
+
+O usuário tem o direito de:
+
+Solicitar acesso ou correção de informações pessoais.
+
+Solicitar exclusão de dados coletados, respeitando obrigações legais e de auditoria.
+
+Revogar consentimento para coleta de dados, observando que isso pode afetar a funcionalidade da Wallet.
+
+7. Alterações nesta Política
+
+A BRNC INC pode atualizar esta Política de Privacidade a qualquer momento. Mudanças serão comunicadas na interface da Wallet ou via canais oficiais.
 © LUCAS JANUARIO BRNC INC ®
 Todos os direitos reservados. Este projeto é de uso privado e não deve ser redistribuído sem autorização.
