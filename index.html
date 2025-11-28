@@ -109,11 +109,13 @@ footer{
 <div class="container">
 <h1>ENDERMAN CHEERS WALLET</h1>
 
+<!-- Conectar Carteira -->
 <div class="card">
   <button id="connectBtn">Conectar Carteira</button>
   <div id="walletAddr" class="small">Status: desconectado</div>
 </div>
 
+<!-- PIX + Mint -->
 <div class="card">
   <h2 style="text-align:center">JANUS26</h2>
   <input id="pixValue" placeholder="Valor (BRL)"/>
@@ -123,6 +125,7 @@ footer{
   <div id="pixQRContainer"></div>
 </div>
 
+<!-- Logs -->
 <div class="card">
   <h2 style="text-align:center">Logs</h2>
   <pre id="log">RUNNING HORIGAMI SUIT 1.0 ...</pre>
@@ -131,6 +134,7 @@ footer{
 <footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
 
 <script>
+// LOG
 function log(msg){
   const l=document.getElementById("log");
   l.textContent += "\n"+msg;
@@ -138,9 +142,11 @@ function log(msg){
   console.log(msg);
 }
 
+// ETHERS
 let provider=null, signer=null, contract=null;
 const ABI=["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
 
+// Auto-connect se MetaMask já estiver ativa
 async function autoConnect(){
   if(window.ethereum){
     provider=new ethers.BrowserProvider(window.ethereum);
@@ -154,6 +160,7 @@ async function autoConnect(){
 }
 autoConnect();
 
+// Conectar Carteira
 document.getElementById("connectBtn").onclick=async()=>{
   if(!window.ethereum){alert("MetaMask necessária."); return;}
   await ethereum.request({method:"eth_requestAccounts"});
@@ -168,19 +175,71 @@ document.getElementById("connectBtn").onclick=async()=>{
   log("Contrato carregado.");
 };
 
+// SHA256
 async function sha256Hex(text){
   const enc=new TextEncoder().encode(text);
   const hash=await crypto.subtle.digest("SHA-256",enc);
   return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-document.getElementById("pixQRBtn").onclick=async()=>{
-  if(!contract){alert("Conecte a carteira e informe o contrato."); return;}
-  const amount=document.getElementById("pixValue").value;
-  const key=document.getElementById("pixUserKey").value;
-  const note=document.getElementById("userNote").value;
+// === DAQ MainB Net Engine ===
+const DAQEngine = {
+  active: false,
+  walletAddress: null,
+  contract: null,
+  interval: null,
 
-  if(!amount || !key){alert("Preencha valor e chave Pix."); return;}
+  init: async function(signerInstance, contractInstance) {
+    if(!signerInstance || !contractInstance) return;
+    this.walletAddress = await signerInstance.getAddress();
+    this.contract = contractInstance;
+    this.active = true;
+    log("[DAQ Engine] Inicializada para: "+this.walletAddress);
+
+    this.interval = setInterval(async ()=>{
+      try {
+        if(!this.active) return;
+        // Simulação de saldo
+        let balance = Math.floor(Math.random()*1000);
+        log(`[DAQ Engine] Saldo JANUS26: ${balance}`);
+      } catch(e) {
+        log("[DAQ Engine] Erro ao atualizar saldo: "+e);
+      }
+    }, 10000);
+  },
+
+  stop: function() {
+    this.active = false;
+    if(this.interval) clearInterval(this.interval);
+    log("[DAQ Engine] Desativada.");
+  },
+
+  mintMonitor: async function(amount, key, note){
+    if(!this.active || !this.contract) {log("[DAQ Engine] Engine não ativa."); return;}
+    try {
+      const txData = amount+key+note;
+      const hash = await sha256Hex(txData);
+      const amountWei = BigInt(Math.floor(parseFloat(amount)*1e15));
+      const tx = await this.contract.mintWithPaymentHash(hash,"0x",amountWei);
+      log("[DAQ Engine] Mint enviado: "+tx.hash);
+      await tx.wait();
+      log("[DAQ Engine] Mint concluído via engine!");
+    } catch(e){
+      log("[DAQ Engine] Erro mint: "+e);
+    }
+  }
+};
+
+// Botão PIX + Mint acionando engine
+document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
+  if(!signer || !contract){log("Conecte carteira e contrato antes."); return;}
+  await DAQEngine.init(signer, contract);
+
+  const amount=document.getElementById("pixValue").value.trim();
+  const key=document.getElementById("pixUserKey").value.trim();
+  const note=document.getElementById("userNote").value.trim();
+
+  if(!amount || !key){alert("Preencha valor e chave PIX."); return;}
   if(isNaN(amount)){alert("Valor inválido."); return;}
 
   const brcode=`000201...valor${amount}...chave${key}...note${note}`;
@@ -191,20 +250,9 @@ document.getElementById("pixQRBtn").onclick=async()=>{
   container.appendChild(img);
   log("QRCode PIX gerado.");
 
-  try{
-    const txPix=amount+key+note;
-    const paymentHash=await sha256Hex(txPix);
-    const amountWei=BigInt(Math.floor(parseFloat(amount)*1e15));
-    const tx=await contract.mintWithPaymentHash(paymentHash,"0x",amountWei);
-    log("Mint enviado: "+tx.hash);
-    await tx.wait();
-    log("Mint via PIX concluído!");
-  }catch(e){
-    log("Erro no mint: "+e);
-  }
-};
+  await DAQEngine.mintMonitor(amount,key,note);
+});
 </script>
 </div>
 </body>
 </html>
-
