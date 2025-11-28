@@ -1,9 +1,7 @@
 #Enderman Cheers Wallet
 ---------------------------
 https://discord.gg/aJZNCCh6
-https://discord.gg/aJZNCCh6
-https://discord.gg/aJZNCCh6
-https://discord.gg/aJZNCCh6
+
 
 Enderman Cheers Wallet é uma carteira digital minimalista e moderna para interações com Ethereum (ETH) e integração de pagamentos via PIX, permitindo mint direto de tokens JANUS26 com QR Code, utilizando Ethers.js para conexão com contratos inteligentes.
 
