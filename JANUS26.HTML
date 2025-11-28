@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Enderman Cheers Wallet</title>
+
+<style>
+:root{
+  --bg:#000;
+  --container:#1c1c1c;
+  --panel:#2a2a2a;
+  --accent:#4CAF50;
+  --pix:#1A73E8;
+  --text:#e6eef3;
+  --muted:#9aa4ad;
+  --footer:#fff;
+  font-family:Inter,sans-serif;
+  --zoom:1.25;
+}
+body{
+  background:var(--bg);
+  color:var(--text);
+  margin:0;
+  padding:20px;
+  transform:scale(var(--zoom));
+  transform-origin:top center;
+}
+.container{
+  max-width:400px;
+  margin:0 auto;
+  background:var(--container);
+  padding:25px;
+  border-radius:20px;
+  box-shadow:0 5px 25px rgba(0,0,0,0.6);
+}
+h1{
+  text-align:center;
+  margin:0 0 25px 0;
+  font-size:32px;
+}
+.card{
+  background:var(--panel);
+  border-radius:14px;
+  padding:18px;
+  margin-bottom:18px;
+}
+input{
+  width:100%;
+  padding:7px;
+  margin:5px 0;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.15);
+  background:rgba(255,255,255,0.05);
+  color:var(--text);
+  font-size:15px;
+  text-align:center;
+}
+input:focus{
+  border-color:var(--accent);
+  background:rgba(255,255,255,0.08);
+}
+button{
+  padding:12px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:600;
+  width:100%;
+  background:var(--accent);
+  color:#000;
+  font-size:15px;
+}
+button:hover{
+  opacity:0.85;
+  transform:scale(1.02);
+}
+.small{
+  font-size:14px;
+  color:var(--muted);
+  text-align:center;
+}
+pre{
+  background:var(--panel);
+  padding:10px;
+  border-radius:10px;
+  font-size:14px;
+  max-height:220px;
+  overflow:auto;
+}
+footer{
+  text-align:center;
+  margin-top:25px;
+  font-size:15px;
+  color:var(--footer);
+}
+#pixQRContainer img{
+  border-radius:14px;
+  display:block;
+  margin:15px auto;
+}
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.min.js"></script>
+</head>
+
+<body>
+<div class="container">
+<h1>ENDERMAN CHEERS WALLET</h1>
+
+<div class="card">
+  <button id="connectBtn">Conectar Carteira</button>
+  <div id="walletAddr" class="small">Status: desconectado</div>
+</div>
+
+<div class="card">
+  <h2 style="text-align:center">JANUS26</h2>
+  <input id="pixValue" placeholder="Valor (BRL)"/>
+  <input id="pixUserKey" placeholder="Chave PIX"/>
+  <input id="userNote" placeholder="Observação (opcional)"/>
+  <button id="pixQRBtn">Gerar QR Code + Mint</button>
+  <div id="pixQRContainer"></div>
+</div>
+
+<div class="card">
+  <h2 style="text-align:center">Logs</h2>
+  <pre id="log">RUNNING HORIGAMI SUIT 1.0 ...</pre>
+</div>
+
+<footer>©CEO LUCAS JANUARIO BRNC INC ®</footer>
+
+<script>
+function log(msg){
+  const l=document.getElementById("log");
+  l.textContent += "\n"+msg;
+  l.scrollTop=l.scrollHeight;
+  console.log(msg);
+}
+
+let provider=null, signer=null, contract=null;
+const ABI=["function mintWithPaymentHash(bytes32 h, bytes a, uint256 v) external returns(uint256)"];
+
+async function autoConnect(){
+  if(window.ethereum){
+    provider=new ethers.BrowserProvider(window.ethereum);
+    const accounts=await provider.send("eth_accounts",[]);
+    if(accounts.length>0){
+      signer=await provider.getSigner();
+      document.getElementById("walletAddr").textContent="Conectado: "+await signer.getAddress();
+      log("Carteira conectada automaticamente.");
+    }
+  }
+}
+autoConnect();
+
+document.getElementById("connectBtn").onclick=async()=>{
+  if(!window.ethereum){alert("MetaMask necessária."); return;}
+  await ethereum.request({method:"eth_requestAccounts"});
+  provider=new ethers.BrowserProvider(window.ethereum);
+  signer=await provider.getSigner();
+  document.getElementById("walletAddr").textContent="Conectado: "+await signer.getAddress();
+  log("Carteira conectada.");
+
+  const addr=prompt("Endereço do contrato JANUS26:");
+  if(!ethers.isAddress(addr)){log("Contrato inválido."); return;}
+  contract=new ethers.Contract(addr,ABI,signer);
+  log("Contrato carregado.");
+};
+
+async function sha256Hex(text){
+  const enc=new TextEncoder().encode(text);
+  const hash=await crypto.subtle.digest("SHA-256",enc);
+  return "0x"+Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+document.getElementById("pixQRBtn").onclick=async()=>{
+  if(!contract){alert("Conecte a carteira e informe o contrato."); return;}
+  const amount=document.getElementById("pixValue").value;
+  const key=document.getElementById("pixUserKey").value;
+  const note=document.getElementById("userNote").value;
+
+  if(!amount || !key){alert("Preencha valor e chave Pix."); return;}
+  if(isNaN(amount)){alert("Valor inválido."); return;}
+
+  const brcode=`000201...valor${amount}...chave${key}...note${note}`;
+  const img=document.createElement("img");
+  img.src="https://api.qrserver.com/v1/create-qr-code/?size=225x225&data="+encodeURIComponent(brcode);
+  const container=document.getElementById("pixQRContainer");
+  container.innerHTML=""; 
+  container.appendChild(img);
+  log("QRCode PIX gerado.");
+
+  try{
+    const txPix=amount+key+note;
+    const paymentHash=await sha256Hex(txPix);
+    const amountWei=BigInt(Math.floor(parseFloat(amount)*1e15));
+    const tx=await contract.mintWithPaymentHash(paymentHash,"0x",amountWei);
+    log("Mint enviado: "+tx.hash);
+    await tx.wait();
+    log("Mint via PIX concluído!");
+  }catch(e){
+    log("Erro no mint: "+e);
+  }
+};
+</script>
+</div>
+</body>
+</html>
