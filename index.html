@@ -229,6 +229,74 @@ const DAQEngine = {
     }
   }
 };
+<!-- Guardian GX -->
+<div class="card">
+  <h2 style="text-align:center; color:#1db954;">Guardian GX - Trade 2025</h2>
+
+  <label for="gxParam1">Parâmetro 1 (Performance mínima %):</label>
+  <input id="gxParam1" placeholder="Ex: 5"/>
+
+  <label for="gxParam2">Parâmetro 2 (Risco/ajuste %):</label>
+  <input id="gxParam2" placeholder="Ex: 2"/>
+
+  <label for="gxNumResults">Número de Resultados:</label>
+  <input type="number" id="gxNumResults" value="10" min="1" max="10"/>
+
+  <button id="gxRunBtn">Rodar Guardian GX</button>
+
+  <div class="results" id="gxResults"></div>
+</div>
+
+<script>
+// Top 10 títulos trade 2025
+const gxTopTrade2025 = [
+  {ticker:'INOD', nome:'Innodata Inc.', performance:15},
+  {ticker:'MIRM', nome:'Mirum Pharmaceuticals', performance:12},
+  {ticker:'CEVA', nome:'CEVA Inc.', performance:10},
+  {ticker:'OKLO', nome:'Oklo Inc.', performance:9},
+  {ticker:'IKT', nome:'Inhibikase Therapeutics', performance:8},
+  {ticker:'NVDA', nome:'NVIDIA', performance:18},
+  {ticker:'MSFT', nome:'Microsoft', performance:12},
+  {ticker:'AMZN', nome:'Amazon', performance:10},
+  {ticker:'MU', nome:'Micron Technology', performance:9},
+  {ticker:'PLTR', nome:'Palantir Technologies', performance:11}
+];
+
+// Função de score para o Guardian GX
+function gxCalculateScore(item, param1, param2) {
+  let p1 = parseFloat(param1) || 1;
+  let p2 = parseFloat(param2) || 0;
+  let score = item.performance * (p1/10) - p2;
+  return score.toFixed(2);
+}
+
+// Função integrada à wallet
+async function runGuardianGXWallet(param1, param2, numResults) {
+  const resultsDiv = document.getElementById("gxResults");
+  resultsDiv.innerHTML="";
+
+  let selectedData = gxTopTrade2025.slice(0, numResults || 10);
+  selectedData.forEach(item=>{
+    const score = gxCalculateScore(item, param1, param2);
+    const div = document.createElement("div");
+    div.classList.add("result-item");
+    div.innerHTML = `<strong>${item.ticker} - ${item.nome}</strong> | Performance: ${item.performance}% | Score: ${score}`;
+    resultsDiv.appendChild(div);
+  });
+
+  // Log no painel da wallet
+  log(`[Guardian GX] Scan executado: ${numResults || 10} resultados mostrados.`);
+}
+
+// Botão para rodar Guardian GX
+document.getElementById("gxRunBtn").addEventListener("click", ()=>{
+  const param1 = document.getElementById("gxParam1").value;
+  const param2 = document.getElementById("gxParam2").value;
+  const numResults = parseInt(document.getElementById("gxNumResults").value) || 10;
+
+  runGuardianGXWallet(param1, param2, numResults);
+});
+</script>
 
 // Botão PIX + Mint acionando engine
 document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
@@ -256,3 +324,4 @@ document.getElementById("pixQRBtn").addEventListener("click", async ()=>{
 </div>
 </body>
 </html>
+
